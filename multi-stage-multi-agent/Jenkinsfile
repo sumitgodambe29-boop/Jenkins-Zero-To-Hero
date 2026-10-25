@@ -1,21 +1,44 @@
+
 pipeline {
-  agent none
-  stages {
-    stage('Back-end') {
-      agent {
-        docker { image 'maven:3.8.1-adoptopenjdk-11' }
-      }
-      steps {
-        sh 'mvn --version'
-      }
+    agent none
+
+    stages {
+        stage('Back-end') {
+            agent {
+                docker {
+                    image 'maven:3.9.16-eclipse-temurin-17'
+                }
+            }
+            steps {
+                echo 'Checking Maven and Java versions...'
+                sh 'mvn --version'
+                sh 'java -version'
+            }
+        }
+
+        stage('Front-end') {
+            agent {
+                docker {
+                    image 'node:lts'
+                }
+            }
+            steps {
+                echo 'Checking Node.js and npm versions...'
+                sh 'node --version'
+                sh 'npm --version'
+            }
+        }
     }
-    stage('Front-end') {
-      agent {
-        docker { image 'node:16-alpine' }
-      }
-      steps {
-        sh 'node --version'
-      }
+
+    post {
+        success {
+            echo 'SUCCESS: Both Back-end and Front-end stages completed.'
+        }
+        failure {
+            echo 'FAILURE: Check the Console Output for details.'
+        }
+        always {
+            echo 'Jenkins pipeline execution finished.'
+        }
     }
-  }
 }
